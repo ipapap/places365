@@ -147,9 +147,13 @@ weight_softmax = params[-2].data.numpy()
 weight_softmax[weight_softmax<0] = 0
 
 # load the test image
-img_url = 'http://places.csail.mit.edu/demo/6.jpg'
-os.system('wget %s -q -O test.jpg' % img_url)
-img = Image.open('test.jpg')
+# img_url = 'http://places.csail.mit.edu/demo/6.jpg'
+# os.system('wget %s -q -O test.jpg' % img_url)
+img_path='/home/gns/Downloads/Datasets/kitti05/image_1/000000.png'#'/home/gns/Downloads/Datasets/eudokimos/Gryphon_dataset/Gryphon_dataset/Raw_images/MORNING/right_im/50.jpg'
+img = Image.open(img_path)
+rgbimg = Image.new("RGB", img.size)
+rgbimg.paste(img)
+img=rgbimg
 input_img = V(tf(img).unsqueeze(0))
 
 # forward pass
@@ -159,8 +163,8 @@ probs, idx = h_x.sort(0, True)
 probs = probs.numpy()
 idx = idx.numpy()
 
-print('RESULT ON ' + img_url)
-
+# print('RESULT ON ' + img_url)
+print('RESULT')
 # output the IO prediction
 io_image = np.mean(labels_IO[idx[:10]]) # vote for the indoor or outdoor
 if io_image < 0.5:
@@ -185,7 +189,7 @@ print('Class activation map is saved as cam.jpg')
 CAMs = returnCAM(features_blobs[0], weight_softmax, [idx[0]])
 
 # render the CAM and output
-img = cv2.imread('test.jpg')
+img = cv2.imread(img_path)
 height, width, _ = img.shape
 heatmap = cv2.applyColorMap(cv2.resize(CAMs[0],(width, height)), cv2.COLORMAP_JET)
 result = heatmap * 0.4 + img * 0.5
