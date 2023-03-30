@@ -160,7 +160,7 @@ def unified(img):
     input_img = V(tf(img).unsqueeze(0))
 
     # forward pass
-    logit = model.forward(input_img.to(device))
+    logit, d = model.forward(input_img.to(device))
     h_x = F.softmax(logit, 1).data.squeeze()
     probs, idx = h_x.sort(0, True)
     probs = probs.cpu().numpy()
@@ -186,7 +186,7 @@ def unified(img):
     attributes=(responses_attribute[idx_a],idx_a,np.asarray(labels_attribute)[idx_a])
     out={'io_image':io_image,'categories':categories,'attributes':attributes}
     features_blobs.clear()
-    return(out)
+    return(out,d.detach().cpu().numpy().ravel())
 # generate class activation mapping
 # print('Class activation map is saved as cam.jpg')
 # CAMs = returnCAM(features_blobs[0], weight_softmax, [idx[0]])
